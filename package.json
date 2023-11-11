@@ -1,0 +1,33 @@
+{
+  "name": "assistant-manager",
+  "version": "1.0.0",
+  "description": "A Node.js library for managing interactions with OpenAI's GPT models, including creating assistants, managing threads, and handling messages.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luissuil/assistant-manager.git"
+  },
+  "keywords": [
+    "openai",
+    "gpt",
+    "assistant",
+    "ai",
+    "chatbot"
+  ],
+  "author": "Luis Perez",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "4.17.4"
+  },
+  "devDependencies": {
+    "dotenv": "16.3.1"
+  },
+  "bugs": {
+    "url": "https://github.com/luissuil/assistant-manager/issues"
+  },
+  "homepage": "https://github.com/luissuil/assistant-manager#readme"
+}
