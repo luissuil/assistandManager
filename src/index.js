@@ -121,10 +121,7 @@ class OpenAIConversationManager {
       if (handler) {
         handler(executionId);
       } else if (retryCount < MAX_RETRIES) {
-          console.log(`Intento ${retryCount + 1} de ${MAX_RETRIES}`)
-          console.log(`Estado actual: ${executionStatus}`)
-          const delay = Math.min(MAX_DELAY, BASE_DELAY * Math.pow(2, retryCount));
-          console.log(`Reintentando en ${delay}ms...`)
+          const delay = Math.min(MAX_DELAY, BASE_DELAY * Math.pow(2, retryCount));        
         await new Promise((resolve) => setTimeout(resolve, delay));
         await this.verifyExecutionStatus(executionId, retryCount + 1);
       } else {

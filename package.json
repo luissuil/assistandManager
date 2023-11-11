@@ -1,6 +1,6 @@
 {
   "name": "assistant-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Node.js library for managing interactions with OpenAI's GPT models, including creating assistants, managing threads, and handling messages.",
   "main": "src/index.js",
   "type": "module",
@@ -29,5 +29,12 @@
   "bugs": {
     "url": "https://github.com/luissuil/assistant-manager/issues"
   },
-  "homepage": "https://github.com/luissuil/assistant-manager#readme"
+  "homepage": "https://github.com/luissuil/assistant-manager#readme",
+  "bin":{
+    "assistant-manager": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "preferGlobal": true
 }
