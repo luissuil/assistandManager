@@ -1,5 +1,7 @@
-import readline from "readline";
+// @ts-ignore
+import readline from "node:readline";
 import OpenAIConversationManager from "../src/index.js";
+// @ts-ignore
 import OpenAI from "openai";
 import { config } from "dotenv";
 config();
@@ -11,6 +13,7 @@ const rl = readline.createInterface({
 });
 
 // Reemplaza 'tu-api-key' con tu clave API real de OpenAI
+// @ts-ignore
 const conversationManager = new OpenAIConversationManager({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -18,11 +21,13 @@ const conversationManager = new OpenAIConversationManager({
 
 try {
   // Inicializa el asistente de OpenAI
+  // @ts-ignore
   await conversationManager.initializeAssistant({
     name: "asistente virtual",
     model: "gpt-4-0613",
     instructions:
       "Eres un asistente virtual que ayuda a los desarrolladores a crear aplicaciones.",
+    // @ts-ignore
     tools: [{ type: "code_interpreter" }, {type:"retriever"}],
   });
 
