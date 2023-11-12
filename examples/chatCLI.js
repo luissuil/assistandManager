@@ -1,5 +1,6 @@
 import readline from "readline";
 import OpenAIConversationManager from "../src/index.js";
+import OpenAI from "openai";
 import { config } from "dotenv";
 config();
 
@@ -14,6 +15,7 @@ const conversationManager = new OpenAIConversationManager({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+
 try {
   // Inicializa el asistente de OpenAI
   await conversationManager.initializeAssistant({
@@ -21,7 +23,7 @@ try {
     model: "gpt-4-0613",
     instructions:
       "Eres un asistente virtual que ayuda a los desarrolladores a crear aplicaciones.",
-    tools: [{ type: "code_interpreter" }],
+    tools: [{ type: "code_interpreter" }, {type:"retriever"}],
   });
 
   console.log("Asistente de OpenAI inicializado. Puedes comenzar a chatear.");

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import OpenAI from "openai";
 import OpenAIModels from "./models.js";
 

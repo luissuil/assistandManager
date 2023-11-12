@@ -24,13 +24,14 @@
     "openai": "4.17.4"
   },
   "devDependencies": {
-    "dotenv": "16.3.1"
+    "dotenv": "16.3.1",
+    "typescript": "^5.2.2"
   },
   "bugs": {
     "url": "https://github.com/luissuil/assistant-manager/issues"
   },
   "homepage": "https://github.com/luissuil/assistant-manager#readme",
-  "bin":{
+  "bin": {
     "assistant-manager": "./src/index.js"
   },
   "engines": {

@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "allowJs": true,
+      "checkJs": true,
+      "declaration": true,
+      "emitDeclarationOnly": true,
+      "outDir": "./types",
+      "baseUrl": ".",
+      "paths": {
+        "*": ["types/*"]
+      }
+    },
+    "include": ["src/**/*", "**/*.js"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+  }
+  
