@@ -51,7 +51,7 @@ OPENAI_API_KEY=tu_clave_api_aquí
 ### Inicialización de la Clase
 
 ```javascript
-import OpenAIConversationManager from './OpenAIConversationManager.js';
+import OpenAIConversationManager from 'assistant-manager';
 
 const manager = new OpenAIConversationManager({
   apiKey: process.env.OPENAI_API_KEY,
