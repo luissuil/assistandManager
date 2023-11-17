@@ -37,5 +37,5 @@
     "node": ">=14.0.0"
   },
   "preferGlobal": true,
-  "types": "./src/index.d.ts"
+  "types": "./src/openai.d.js"
 }
