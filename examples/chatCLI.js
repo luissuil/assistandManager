@@ -1,35 +1,27 @@
-// @ts-ignore
+
 import readline from "node:readline";
 import OpenAIConversationManager from "../src/index.js";
-// @ts-ignore
-import OpenAI from "openai";
+
 import { config } from "dotenv";
+import { stdout } from "node:process";
+import { CodeInterpreter } from "../src/openai.d.js";
 config();
 
-// Configura readline para leer desde la consola
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-// Reemplaza 'tu-api-key' con tu clave API real de OpenAI
-// @ts-ignore
+
 const conversationManager = new OpenAIConversationManager({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
+  
 
 try {
-  // Inicializa el asistente de OpenAI
-  // @ts-ignore
-  await conversationManager.initializeAssistant({
-    name: "asistente virtual",
-    model: "gpt-4-0613",
-    instructions:
-      "Eres un asistente virtual que ayuda a los desarrolladores a crear aplicaciones.",
-    // @ts-ignore
-    tools: [{ type: "code_interpreter" }, {type:"retriever"}],
-  });
+
+  await conversationManager.getAssistant("asst_x129roTTOQTWADazkJCIsAW3");
 
   console.log("Asistente de OpenAI inicializado. Puedes comenzar a chatear.");
   rl.setPrompt("Tú: ");
@@ -37,27 +29,33 @@ try {
 
   rl.on("line", (line) => {
     conversationManager.submitQuestion(line.trim());
-  });
+  })
 
-  // Configura el manejador de eventos para recibir respuestas
-  conversationManager.onEvent("responseReceived", (response) => {
+  conversationManager.on('response', ({response,status}) => {
     if (response.role === "assistant") {
+      console.log(status)
       console.log(`Asistente: ${response.content[0].text.value}`);
       rl.setPrompt("Tú: ");
     } else {
-      console.log(`Tú: ${response.content[0].text.value}`);
+      console.log(`Tú: ${response.content[0].text.value} `);
       rl.setPrompt("Asistente: ");
     }
 
     rl.prompt();
-  });
+  })
+
+  conversationManager.on('status', (status) => {
+    /* delete line and console.log */
+    stdout.clearLine();
+    console.log(status.stepRun)
+  })
 
 
-  conversationManager.onEvent("error", (error) => {
+  conversationManager.on("error", (error) => {
     console.error(`Error: ${error}`);
     rl.setPrompt("Tú: ");
     rl.prompt();
-  });
+  })
 } catch (error) {
   console.error(`Error al inicializar el asistente: ${error}`);
 }

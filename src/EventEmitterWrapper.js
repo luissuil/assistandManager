@@ -22,7 +22,7 @@ class EventEmitterWrapper {
 
     /**
      * Emite un evento con los datos especificados
-     * @param {string} event - Nombre del evento a emitir
+     * @param {('response'|'error')} event - Nombre del evento a emitir ('response' o 'error')
      * @param {*} data - Datos a enviar junto con el evento
      */
     emit(event, data) {

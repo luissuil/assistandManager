@@ -1,7 +1,7 @@
 import OpenAIClient from "./OpenAIClient.js";
 import OpenAIAssistantManager from "./OpenAIAssistantManager.js";
 import EventEmitterWrapper from "./EventEmitterWrapper.js";
-import OpenAIModels from "./models.js";
+import {Assistant,Message} from "./openai.d.js";
 
 /**
  * Clase que maneja la conversación con OpenAI.
@@ -13,6 +13,7 @@ import OpenAIModels from "./models.js";
  * @property {Function} executionHandlers.failed - Manejador de ejecución fallida.
  * @property {Function} executionHandlers.cancelled - Manejador de ejecución cancelada.
  * @property {Function} executionHandlers.expired - Manejador de ejecución expirada.
+ * @property {Function} executionHandlers.
  */
 class OpenAIConversationManager {
   /**
@@ -58,22 +59,39 @@ class OpenAIConversationManager {
   /**
    * Inicializa el asistente con el nombre y modelo especificados.
    * @async
-   * @param {Object} config - Configuración del asistente.
-   * @param {string} config.name - Nombre del asistente.
-   * @param {OpenAIModels} config.model - Modelo del asistente.
-   * @param {string} config.instructions - Instrucciones del asistente.
-   * @param {Array<string>} config.tools - Herramientas del asistente.
+   * @param {Assistant} config - Configuración del asistente.
+   * 
+   * @returns {Promise<Assistant>} - Una promesa que se resuelve con el asistente inicializado.
    *
    */
   async initializeAssistant(config) {
-    await this.assistantManager.initializeAssistant(config);
+    try {
+      await this.assistantManager.createAssistant(config)
+    } catch (error) {
+      this.eventEmitter.emit(
+        "error",
+        `Error al inicializar el asistente: ${error}`
+      );
+    }
+    
   }
+  /**
+   * Obtiene el asistente con el ID especificado.
+   * @async
+   * @param {string} id - ID del asistente.
+   * 
+   */
+
+  async getAssistant(id) {
+    await this.assistantManager.getAssistant(id);
+  }
+  
 
   /**
    * Envía una pregunta al asistente.
    * @async
-   * @param {string} question - Pregunta a enviar.
-   * @returns {Promise<void>}
+   * @param {Message} question - Enviar 
+   * @returns {Promise<Message>}
    */
   async submitQuestion(question) {
     try {
@@ -105,7 +123,7 @@ class OpenAIConversationManager {
    * - Esto ayuda a evitar sobrecargas en el sistema y manejar mejor las situaciones de alta latencia o respuestas retardadas.
    */
   async verifyExecutionStatus(executionId, retryCount = 0) {
-    const MAX_RETRIES = 12; // Máximo número de reintentos
+    const MAX_RETRIES = 14; // Máximo número de reintentos
     const BASE_DELAY = 500; // Tiempo base de espera en milisegundos
     const MAX_DELAY = 5000; // Tiempo máximo de espera en milisegundos
 
@@ -116,13 +134,14 @@ class OpenAIConversationManager {
           executionId
         );
       const executionStatus = executionResult.status;
-
+      const stepRun = await this.assistantManager.getSteps(executionId);
       const handler = this.executionHandlers[executionStatus];
       if (handler) {
-        handler(executionId);
+        handler(executionId, executionStatus);
       } else if (retryCount < MAX_RETRIES) {
           const delay = Math.min(MAX_DELAY, BASE_DELAY * Math.pow(2, retryCount));        
         await new Promise((resolve) => setTimeout(resolve, delay));
+        this.getStatusChanger({status:executionStatus,stepRun});
         await this.verifyExecutionStatus(executionId, retryCount + 1);
       } else {
         this.eventEmitter.emit(
@@ -141,12 +160,17 @@ class OpenAIConversationManager {
   /**
    * Manejador de ejecución completada.
    * @async
-   * @param {string} executionId - ID de la ejecución.
+   * @param {string} _executionId - ID de la ejecución.
    * @returns {Promise<void>}
    */
-  async handleCompleted(executionId) {
+  async handleCompleted(_executionId, status) {
+    const run = await this.assistantManager.getSteps(_executionId);
+    console.log(run)
+    /**
+     * @type {Message}
+     */
     const response = await this.assistantManager.getLastMessage();
-    this.eventEmitter.emit("responseReceived", response);
+    this.eventEmitter.emit('response', {response});
   }
 
   /**
@@ -159,8 +183,19 @@ class OpenAIConversationManager {
   handleErrorState(executionId, status) {
     this.eventEmitter.emit(
       "error",
-      `Ejecución fallida o cancelada/expirada. Estado: ${status}`
+      `Ejecución fallida o cancelada/expirada. Estado: ${status}
+       ID de ejecución: ${executionId}
+      `
     );
+  }
+  
+  /**
+   * Get status changer
+   * @param {string} staus - Estado de la ejecución.
+   * @returns {Promise<void>}
+   */
+  getStatusChanger(staus) {
+    return this.eventEmitter.emit('status', staus);
   }
 
   /**
@@ -169,9 +204,11 @@ class OpenAIConversationManager {
    * @param {Function} listener - Listener del evento.
    * @returns {void}
    */
-  onEvent(event, listener) {
+  on(event, listener) {
     this.eventEmitter.on(event, listener);
   }
+
+  
 }
 
 export default OpenAIConversationManager;

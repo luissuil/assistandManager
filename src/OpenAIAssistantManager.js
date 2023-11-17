@@ -8,6 +8,30 @@ class OpenAIAssistantManager {
   async initializeAssistant(assistantName, model) {
     const assistant = await this.openaiClient.createAssistant(assistantName, model);
     this.currentAssistantId = assistant.id;
+    this.createThread()
+  }
+
+  async getAssistant(id) {
+    const assistant = await this.openaiClient.getAssistant(id);
+    if(assistant) {
+      this.currentAssistantId = assistant.id
+      this.createThread()
+    }else{
+      return null
+    }
+      
+  }
+
+  async getSteps(runId) {
+    if(this.currentThreadId !== null && this.currentAssistantId){
+      const steps = await this.openaiClient.stepRun(this.currentThreadId, runId)
+      return steps
+    }else{
+      return null
+    }
+  }
+
+  async createThread() {
     const thread = await this.openaiClient.createThread();
     this.currentThreadId = thread.id;
   }

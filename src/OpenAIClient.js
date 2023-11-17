@@ -1,6 +1,6 @@
 // @ts-nocheck
 import OpenAI from "openai";
-import OpenAIModels from "./models.js";
+import { Assistant } from "./openai.d.js";
 
 /**
  * Clase que representa un cliente de OpenAI.
@@ -8,11 +8,10 @@ import OpenAIModels from "./models.js";
  */
 class OpenAIClient {
   /**
-   * Crea una instancia de OpenAIClient.
-   * @constructor
-   * @param {Object} config - La configuración del cliente de OpenAI.
-   * @param {string} config.apiKey - La clave de API de OpenAI.
-   * @param {string} config.organization - La organización de OpenAI.
+   * @param {Assistant} config
+   * 
+   * @returns {Promise<Assistant>}
+   * 
    */
   constructor(config) {
     this.client = new OpenAI(config);
@@ -33,6 +32,18 @@ class OpenAIClient {
     return this.client.beta.assistants.create(config);
   }
 
+  async getAssistant(assistantId) {
+    const assistant = await this.client.beta.assistants.retrieve(assistantId);
+
+    if (assistant) {
+      return assistant;
+    } else {
+      console.error(`No se encontró el asistente con ID ${assistantId}.`);
+    }
+  }
+
+
+
   /**
    * Crea un hilo de conversación.
    * @async
@@ -41,6 +52,7 @@ class OpenAIClient {
   async createThread() {
     return this.client.beta.threads.create();
   }
+  
 
   /**
    * Envía un mensaje a un hilo de conversación.
@@ -64,9 +76,14 @@ class OpenAIClient {
    * @returns {Promise<Object>} - Una promesa que se resuelve con el resultado de la ejecución del hilo de conversación.
    */
   async executeThread(threadId, assistantId) {
+    console.log(`threadId ${threadId} assistantId ${assistantId}`)
     return this.client.beta.threads.runs.create(threadId, {
       assistant_id: assistantId,
     });
+  }
+
+  async stepRun(threadId, executionId) {
+    return await this.client.beta.threads.runs.steps.list(threadId, executionId)
   }
 
   /**
